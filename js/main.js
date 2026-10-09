@@ -98,21 +98,16 @@ window.addEventListener('DOMContentLoaded', function() {
   startSlideInterval();
 });
 
-// 8. 문자(SMS) 자동 발송 엔진 (관리자 010-3959-4442 수신)
+// 8. 문자 자동 발송 엔진 (수신 번호: 010-3959-4442)
 async function sendSmsNotification(data) {
   const ADMIN_PHONE = "010-3959-4442";
   
-  const smsMessage = `[오산헤리티지자이 신규 상담예약]
-- 성함: ${data.name}
-- 연락처: ${data.phone}
-- 희망시간: ${data.timeSlot}
-- 관심평형: ${data.interest}
-- 문의사항: ${data.memo}
-- 접수일시: ${data.submitTime}`;
+  // 👉 불필요한 글자를 모두 제거한 90바이트(단문 SMS) 최적화 양식
+  const smsMessage = `[자이예약] ${data.name} / ${data.phone}
+시간: ${data.timeSlot}
+타입: ${data.interest}${data.memo !== '없음' ? '\n메모: ' + data.memo : ''}`;
 
-  // Make.com 등에서 발급받은 웹후크 URL을 아래 따옴표 안에 넣으시면 실시간 문자가 발송됩니다.
-  const SMS_WEBHOOK_URL = "https://hook.us2.make.com/vmktbinzhx4s14vsoc1lsmanvj7rgsra"; 
-
+  const SMS_WEBHOOK_URL = "https://hook.us2.make.com/vmktbinzhx4s14vsoc1lsmanvj7rgsra";
   if (!SMS_WEBHOOK_URL) {
     console.log("ℹ️ SMS 웹후크 URL 미입력 (콘솔 시뮬레이션):\n" + smsMessage);
     return;
@@ -139,6 +134,7 @@ async function sendSmsNotification(data) {
 async function submitReservation(event) {
   event.preventDefault();
 
+  // 최신 디스코드 웹후크 URL
   const DISCORD_WEBHOOK_URL = "https://discord.com/api/webhooks/1557984207974699020/f8x_PEahdcbujA2ReO73BN1y5SvRV1CsoGmfPn3EmuOV5y8aK1aQZzax8i9KTFr1ln1A";
 
   const agree = document.getElementById('formAgree').checked;
@@ -179,7 +175,7 @@ async function submitReservation(event) {
     username: "오산헤리티지자이 알림봇",
     embeds: [
       {
-        title: "📢 [안수홍] 신규 상담예약 접수 완료!",
+        title: "📢 신규 상담예약 접수 완료!",
         color: 12951641,
         fields: [
           { name: "👤 고객 성함", value: `**${name}**`, inline: true },
@@ -209,7 +205,7 @@ async function submitReservation(event) {
     ]);
 
     if (discordRes.ok || discordRes.status === 204) {
-      alert("상담 예약이 정상 접수되었습니다.\n담당자(안수홍)가 지정하신 시간대에 신속히 연락드리겠습니다.");
+      alert("상담 예약이 정상 접수되었습니다.\n지정하신 시간대에 신속히 연락드리겠습니다.");
       document.getElementById('consultForm').reset();
       if (document.getElementById('customTimeGroup')) {
         document.getElementById('customTimeGroup').style.display = 'none';

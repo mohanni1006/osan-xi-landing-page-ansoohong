@@ -132,7 +132,7 @@ header {
 }
 
 /* -----------------------------------------------------------
-   3. 메인 HERO 섹션
+   3. 메인 HERO 섹션 (상단 여백 19px, 하단 여백 20px로 50% 축소)
 ----------------------------------------------------------- */
 #hero {
   position: relative;
@@ -142,7 +142,7 @@ header {
     radial-gradient(circle at 15% 75%, rgba(197, 160, 89, 0.12), transparent 50%),
     linear-gradient(180deg, #070a11 0%, #0d121c 45%, #05070b 100%);
   min-height: auto;
-  padding: 38px 20px 41px;
+  padding: 19px 20px 20px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -699,7 +699,7 @@ footer {
   align-items: flex-end;
 }
 
-/* 50% 확대된 메인 상담예약 원형 버튼 (기존 52px -> 78px) */
+/* 50% 확대된 메인 상담예약 원형 버튼 (78px) */
 .btn-main-reserve {
   width: 78px;
   height: 78px;
@@ -892,6 +892,7 @@ footer {
   font-weight: 800;
   text-decoration: none;
   user-select: none;
+  white-space: nowrap;
   transition: background 0.2s;
 }
 .btn-bottom-action.call {
@@ -1002,8 +1003,9 @@ footer {
   body {
     padding-bottom: 115px;
   }
+  /* 모바일 HERO 상하 공백 50% 축소 (상단 14px, 하단 16px) */
   #hero {
-    padding: 28px 12px 32px;
+    padding: 14px 12px 16px;
   }
   .hero-title {
     font-size: clamp(23px, 6.2vw, 32px);

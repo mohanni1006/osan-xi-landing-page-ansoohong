@@ -98,12 +98,11 @@ window.addEventListener('DOMContentLoaded', function() {
   startSlideInterval();
 });
 
-// 8. 문자(SMS) 자동 발송 엔진 (수신 번호: 010-3959-4442)
+// 8. 문자(SMS) 자동 발송 엔진 (관리자 010-3959-4442 수신)
 async function sendSmsNotification(data) {
   const ADMIN_PHONE = "010-3959-4442";
   
   const smsMessage = `[오산헤리티지자이 신규 상담예약]
-- 담당자: 안수흥
 - 성함: ${data.name}
 - 연락처: ${data.phone}
 - 희망시간: ${data.timeSlot}
@@ -179,7 +178,7 @@ async function submitReservation(event) {
     username: "오산헤리티지자이 알림봇",
     embeds: [
       {
-        title: "📢 [안수흥] 신규 상담예약 접수 완료!",
+        title: "📢 [안수홍] 신규 상담예약 접수 완료!",
         color: 12951641,
         fields: [
           { name: "👤 고객 성함", value: `**${name}**`, inline: true },
@@ -209,7 +208,7 @@ async function submitReservation(event) {
     ]);
 
     if (discordRes.ok || discordRes.status === 204) {
-      alert("상담 예약이 정상 접수되었습니다.\n담당자(안수흥)가 지정하신 시간대에 신속히 연락드리겠습니다.");
+      alert("상담 예약이 정상 접수되었습니다.\n지정하신 시간대에 신속히 연락드리겠습니다.");
       document.getElementById('consultForm').reset();
       if (document.getElementById('customTimeGroup')) {
         document.getElementById('customTimeGroup').style.display = 'none';
@@ -226,11 +225,10 @@ async function submitReservation(event) {
   }
 }
 
-// 10. 플로팅 스피드 다이얼 메뉴 제어
+// 10. 플로팅 스피드 다이얼 메뉴 토글
 function toggleFloatingMenu(forceState) {
   const container = document.getElementById('floatingNavContainer');
   if (!container) return;
-  
   if (typeof forceState === 'boolean') {
     container.classList.toggle('open', forceState);
   } else {
@@ -238,21 +236,25 @@ function toggleFloatingMenu(forceState) {
   }
 }
 
-// 화면 외부 클릭 시 서브메뉴 자동 닫기
+// 11. 다이렉트 문자(SMS) 연결
+function openDirectSms() {
+  const ADMIN_PHONE = "010-3959-4442";
+  const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+  if (isMobile) {
+    const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
+    const separator = isIOS ? '&' : '?';
+    window.location.href = `sms:${ADMIN_PHONE}${separator}body=${encodeURIComponent('[오산헤리티지자이] 분양 상담 문의드립니다.')}`;
+  } else {
+    alert(`모바일 기기에서 터치하시면 바로 문자(SMS) 전송 화면으로 연결됩니다.\n연락처: ${ADMIN_PHONE}`);
+  }
+}
+
+// 플로팅 메뉴 외부 클릭 시 닫기
 document.addEventListener('click', function(e) {
   const container = document.getElementById('floatingNavContainer');
-  if (!container) return;
-  if (!container.contains(e.target)) {
-    container.classList.remove('open');
+  if (container && container.classList.contains('open')) {
+    if (!container.contains(e.target)) {
+      container.classList.remove('open');
+    }
   }
 });
-
-// 문자 상담 실행 (iOS / Android 호환 분기)
-function openDirectSms() {
-  toggleFloatingMenu(false);
-  const phone = "010-3959-4442";
-  const body = encodeURIComponent("[오산헤리티지자이] 분양 상담 문의드립니다.");
-  const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
-  const smsUrl = isIOS ? `sms:${phone}&body=${body}` : `sms:${phone}?body=${body}`;
-  window.location.href = smsUrl;
-}

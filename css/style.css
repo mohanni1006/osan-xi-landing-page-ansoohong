@@ -132,7 +132,7 @@ header {
 }
 
 /* -----------------------------------------------------------
-   3. 메인 HERO 섹션 (상단 여백 19px, 하단 여백 20px로 50% 축소)
+   3. 메인 HERO 섹션
 ----------------------------------------------------------- */
 #hero {
   position: relative;
@@ -142,7 +142,7 @@ header {
     radial-gradient(circle at 15% 75%, rgba(197, 160, 89, 0.12), transparent 50%),
     linear-gradient(180deg, #070a11 0%, #0d121c 45%, #05070b 100%);
   min-height: auto;
-  padding: 19px 20px 20px;
+  padding: 38px 20px 41px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -775,19 +775,27 @@ footer {
   -webkit-tap-highlight-color: transparent;
 }
 
-/* 원 왼쪽 문구 (투명한 배경) */
+/* 원 왼쪽 문구 (고급스러운 골드 색상 박스) */
 .sub-item-label {
-  background: transparent;
-  color: #ffffff;
-  font-size: 14px;
+  background: linear-gradient(135deg, #e5c98d 0%, #c5a059 50%, #9a7632 100%);
+  color: #0b0e14;
+  font-size: 13.5px;
   font-weight: 800;
   letter-spacing: -0.3px;
   white-space: nowrap;
-  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.95), 0 0 5px rgba(0, 0, 0, 0.9);
-  transition: color 0.2s;
+  padding: 7px 14px;
+  border-radius: 20px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.7), 0 0 10px rgba(197, 160, 89, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  text-shadow: none;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+  user-select: none;
 }
 .floating-sub-item:hover .sub-item-label {
-  color: var(--gold-light);
+  transform: translateX(-4px);
+  box-shadow: 0 6px 20px rgba(197, 160, 89, 0.65);
+  background: linear-gradient(135deg, #f5dfaa 0%, #d4b069 50%, #a8823b 100%);
+  color: #000;
 }
 
 /* 작은 동그란 원형 버튼 */
@@ -892,7 +900,6 @@ footer {
   font-weight: 800;
   text-decoration: none;
   user-select: none;
-  white-space: nowrap;
   transition: background 0.2s;
 }
 .btn-bottom-action.call {
@@ -1003,9 +1010,8 @@ footer {
   body {
     padding-bottom: 115px;
   }
-  /* 모바일 HERO 상하 공백 50% 축소 (상단 14px, 하단 16px) */
   #hero {
-    padding: 14px 12px 16px;
+    padding: 28px 12px 32px;
   }
   .hero-title {
     font-size: clamp(23px, 6.2vw, 32px);

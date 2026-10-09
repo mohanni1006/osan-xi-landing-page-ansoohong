@@ -51,18 +51,7 @@ function toggleFaq(el) {
   item.classList.toggle('open');
 }
 
-// 4. Custom Time Slot Toggle
-function checkCustomTime(select) {
-  const customGroup = document.getElementById('customTimeGroup');
-  if (select.value === 'custom') {
-    customGroup.style.display = 'block';
-    document.getElementById('formCustomTime').focus();
-  } else {
-    customGroup.style.display = 'none';
-  }
-}
-
-// 5. Phone Auto-hyphen
+// 4. Phone Auto-hyphen
 const phoneInput = document.getElementById('formPhone');
 if (phoneInput) {
   phoneInput.addEventListener('input', function(e) {
@@ -76,7 +65,7 @@ if (phoneInput) {
   });
 }
 
-// 6. 팝업창 제어
+// 5. 팝업창 제어
 function openPopup() {
   const modal = document.getElementById('popupModal');
   if (modal) {
@@ -91,19 +80,26 @@ function closePopup() {
   }
 }
 
-// 7. 페이지 로드 초기화
+// 6. 페이지 로드 초기화 (과거 날짜 선택 제한 포함)
 window.addEventListener('DOMContentLoaded', function() {
   openPopup();
   showSlide(0);
   startSlideInterval();
+
+  // 방문 예약 일자: 오늘 이전 과거 날짜 비활성화
+  const dateInput = document.getElementById('formVisitDate');
+  if (dateInput) {
+    const today = new Date().toISOString().split('T')[0];
+    dateInput.min = today;
+  }
 });
 
-// 8. 문자(SMS) 자동 발송 엔진 (단문 90바이트 이하 최적화 / 관리자 010-3959-4442 수신)
+// 7. 문자(SMS) 자동 발송 엔진 (90바이트 이하 최적화 / 관리자 010-3959-4442 수신)
 async function sendSmsNotification(data) {
   const ADMIN_PHONE = "010-3959-4442";
   
-  // 👉 불필요한 라벨 및 접수일시를 제거한 초슬림 단문 SMS 양식 (약 65~75바이트)
-  let smsMessage = `[자이예약] ${data.name} ${data.phone}\n시간: ${data.timeSlot}\n타입: ${data.interest}`;
+  // 👉 90바이트 이내로 맞춘 단문 SMS 양식
+  let smsMessage = `[자이예약] ${data.name} ${data.phone}\n방문: ${data.visitDate} ${data.visitTime}\n타입: ${data.interest}`;
   if (data.memo && data.memo !== '없음') {
     smsMessage += `\n메모: ${data.memo}`;
   }
@@ -132,7 +128,7 @@ async function sendSmsNotification(data) {
   }
 }
 
-// 9. 디스코드 및 문자 전송 처리 엔진
+// 8. 디스코드 및 문자 전송 처리 엔진
 async function submitReservation(event) {
   event.preventDefault();
 
@@ -146,16 +142,14 @@ async function submitReservation(event) {
 
   const name = document.getElementById('formName').value.trim();
   const phone = document.getElementById('formPhone').value.trim();
-  let timeSlot = document.getElementById('formTimeSelect').value;
-  if (timeSlot === 'custom') {
-    timeSlot = document.getElementById('formCustomTime').value.trim() || '직접 입력 미작성';
-  }
+  const visitDate = document.getElementById('formVisitDate').value;
+  const visitTime = document.getElementById('formVisitTime').value;
   const interest = document.getElementById('formInterestType').value;
   const memo = document.getElementById('formMemo').value.trim() || '없음';
   const submitTime = new Date().toLocaleString('ko-KR');
 
-  if (!name || !phone) {
-    alert('이름과 전화번호를 정확히 입력해 주세요.');
+  if (!name || !phone || !visitDate || !visitTime) {
+    alert('성함, 전화번호, 방문 예약 일자 및 시간을 모두 선택해 주세요.');
     return;
   }
 
@@ -166,7 +160,8 @@ async function submitReservation(event) {
   const reservationData = {
     name: name,
     phone: phone,
-    timeSlot: timeSlot,
+    visitDate: visitDate,
+    visitTime: visitTime,
     interest: interest,
     memo: memo,
     submitTime: submitTime
@@ -176,15 +171,16 @@ async function submitReservation(event) {
     username: "오산헤리티지자이 알림봇",
     embeds: [
       {
-        title: "📢 [안수홍] 신규 상담예약 접수 완료!",
+        title: "📢 [안수홍] 신규 방문예약 접수 완료!",
         color: 12951641,
         fields: [
           { name: "👤 고객 성함", value: `**${name}**`, inline: true },
           { name: "📞 전화번호", value: `**${phone}**`, inline: true },
-          { name: "⏰ 통화 가능 시간", value: timeSlot, inline: true },
+          { name: "📅 방문 일자", value: visitDate, inline: true },
+          { name: "⏰ 방문 시간", value: visitTime, inline: true },
           { name: "🏠 관심 평형", value: interest, inline: true },
           { name: "📝 문의 내용", value: memo, inline: false },
-          { name: "📅 신청 일시", value: submitTime, inline: false }
+          { name: "⏱ 접수 일시", value: submitTime, inline: false }
         ],
         footer: {
           text: "오산헤리티지자이 공식 분양홍보관 (대표문의: 010-3959-4442)"
@@ -206,11 +202,8 @@ async function submitReservation(event) {
     ]);
 
     if (discordRes.ok || discordRes.status === 204) {
-      alert("상담 예약이 정상 접수되었습니다.\n지정하신 시간대에 신속히 연락드리겠습니다.");
+      alert("방문 예약이 정상 접수되었습니다.\n담당자가 예약 일시 확인 후 신속히 안내 연락드리겠습니다.");
       document.getElementById('consultForm').reset();
-      if (document.getElementById('customTimeGroup')) {
-        document.getElementById('customTimeGroup').style.display = 'none';
-      }
     } else {
       const errText = await discordRes.text();
       alert("디스코드 전송 실패 (코드: " + discordRes.status + ")\n" + errText);
@@ -223,7 +216,7 @@ async function submitReservation(event) {
   }
 }
 
-// 10. 플로팅 스피드 다이얼 메뉴 토글
+// 9. 플로팅 스피드 다이얼 메뉴 토글
 function toggleFloatingMenu(forceState) {
   const container = document.getElementById('floatingNavContainer');
   if (!container) return;
@@ -234,7 +227,7 @@ function toggleFloatingMenu(forceState) {
   }
 }
 
-// 11. 다이렉트 문자(SMS) 연결 (단문 최적화)
+// 10. 다이렉트 문자(SMS) 연결 (단문 최적화)
 function openDirectSms() {
   const ADMIN_PHONE = "010-3959-4442";
   const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);

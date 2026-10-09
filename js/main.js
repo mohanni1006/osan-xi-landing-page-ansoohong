@@ -98,7 +98,7 @@ window.addEventListener('DOMContentLoaded', function() {
   startSlideInterval();
 });
 
-// 8. 문자(SMS) 자동 발송 엔진 (관리자 010-3959-4442 수신)
+// 8. 문자(SMS) 자동 발송 엔진 (수신 번호: 010-3959-4442)
 async function sendSmsNotification(data) {
   const ADMIN_PHONE = "010-3959-4442";
   
@@ -224,4 +224,35 @@ async function submitReservation(event) {
     submitBtn.disabled = false;
     submitBtn.innerText = '상담 예약 신청';
   }
+}
+
+// 10. 플로팅 스피드 다이얼 메뉴 제어
+function toggleFloatingMenu(forceState) {
+  const container = document.getElementById('floatingNavContainer');
+  if (!container) return;
+  
+  if (typeof forceState === 'boolean') {
+    container.classList.toggle('open', forceState);
+  } else {
+    container.classList.toggle('open');
+  }
+}
+
+// 화면 외부 클릭 시 서브메뉴 자동 닫기
+document.addEventListener('click', function(e) {
+  const container = document.getElementById('floatingNavContainer');
+  if (!container) return;
+  if (!container.contains(e.target)) {
+    container.classList.remove('open');
+  }
+});
+
+// 문자 상담 실행 (iOS / Android 호환 분기)
+function openDirectSms() {
+  toggleFloatingMenu(false);
+  const phone = "010-3959-4442";
+  const body = encodeURIComponent("[오산헤리티지자이] 분양 상담 문의드립니다.");
+  const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+  const smsUrl = isIOS ? `sms:${phone}&body=${body}` : `sms:${phone}?body=${body}`;
+  window.location.href = smsUrl;
 }

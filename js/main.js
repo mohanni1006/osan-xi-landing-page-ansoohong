@@ -98,17 +98,15 @@ window.addEventListener('DOMContentLoaded', function() {
   startSlideInterval();
 });
 
-// 8. 문자(SMS) 자동 발송 엔진 (관리자 010-3959-4442 수신)
+// 8. 문자(SMS) 자동 발송 엔진 (단문 90바이트 이하 최적화 / 관리자 010-3959-4442 수신)
 async function sendSmsNotification(data) {
   const ADMIN_PHONE = "010-3959-4442";
   
-  const smsMessage = `[오산헤리티지자이 신규 상담예약]
-- 성함: ${data.name}
-- 연락처: ${data.phone}
-- 희망시간: ${data.timeSlot}
-- 관심평형: ${data.interest}
-- 문의사항: ${data.memo}
-- 접수일시: ${data.submitTime}`;
+  // 👉 불필요한 라벨 및 접수일시를 제거한 초슬림 단문 SMS 양식 (약 65~75바이트)
+  let smsMessage = `[자이예약] ${data.name} ${data.phone}\n시간: ${data.timeSlot}\n타입: ${data.interest}`;
+  if (data.memo && data.memo !== '없음') {
+    smsMessage += `\n메모: ${data.memo}`;
+  }
 
   const SMS_WEBHOOK_URL = "https://hook.us2.make.com/vmktbinzhx4s14vsoc1lsmanvj7rgsra"; 
 
@@ -236,14 +234,14 @@ function toggleFloatingMenu(forceState) {
   }
 }
 
-// 11. 다이렉트 문자(SMS) 연결
+// 11. 다이렉트 문자(SMS) 연결 (단문 최적화)
 function openDirectSms() {
   const ADMIN_PHONE = "010-3959-4442";
   const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
   if (isMobile) {
     const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
     const separator = isIOS ? '&' : '?';
-    window.location.href = `sms:${ADMIN_PHONE}${separator}body=${encodeURIComponent('[오산헤리티지자이] 분양 상담 문의드립니다.')}`;
+    window.location.href = `sms:${ADMIN_PHONE}${separator}body=${encodeURIComponent('[오산자이] 상담 문의합니다.')}`;
   } else {
     alert(`모바일 기기에서 터치하시면 바로 문자(SMS) 전송 화면으로 연결됩니다.\n연락처: ${ADMIN_PHONE}`);
   }
